@@ -3,7 +3,7 @@ name: Build and Package Windows EXE
 on:
   push:
     tags:
-      - 'v*' # با زدن تگی مثل v1.0.1 این فرآیند شروع می‌شود
+      - 'v*' # با زدن تگی مثل v1.0.4 این فرآیند شروع می‌شود
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version: '3.10' # 🟢 این بخش اصلاح شد تا گیت‌هاب ارور سینتکس ندهد
         cache: 'pip'
 
     - name: Install Dependencies
@@ -30,8 +30,9 @@ jobs:
 
     - name: Download and Extract FFmpeg (Guaranteed Link)
       run: |
-        # دانلود نسخه پرتابل و رسمی از سرورهای گیت‌هاب بدون محدودیت curl
-        Invoke-WebRequest -Uri "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip" -OutFile "ffmpeg.zip"
+        # 🟢 استفاده از لینک فوق‌العاده سبک‌تر و تضمینی Essentials
+        $url = "https://github.com/GyanD/codexffmpeg/releases/download/2026-06-21-git-d007a34651/ffmpeg-2026-06-21-git-d007a34651-essentials_build.zip"
+        Invoke-WebRequest -Uri $url -OutFile "ffmpeg.zip"
         Expand-Archive -Path "ffmpeg.zip" -DestinationPath "ffmpeg_extracted"
 
     - name: Create Clean Zip Package
