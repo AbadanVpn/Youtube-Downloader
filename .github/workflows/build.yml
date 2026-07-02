@@ -1,0 +1,52 @@
+name: Build and Package Windows EXE
+
+on:
+  push:
+    tags:
+      - 'v*' # هر زمان تگی مثل v1.0.0 بزنی، این اسکریپت فعال میشه
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Source Code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-file: '3.10'
+        cache: 'pip'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller PySide6 yt-dlp
+
+    - name: Build EXE with PyInstaller
+      run: |
+        pyinstaller --noconsole --onefile main.py
+
+    - name: Download FFmpeg (Standalone for User)
+      run: |
+        # دانلود نسخه پرتابل و رسمی ffmpeg برای ویندوز
+        curl -L -o ffmpeg.zip https://github.com/GyanD/codexffmpeg/releases/download/2026-06-21-git-d007a34651/ffmpeg-2026-06-21-git-d007a34651-essentials_build.zip
+        Expand-Archive -Path ffmpeg.zip -DestinationPath ffmpeg_extracted
+        # پیدا کردن و جابجایی فایل اصلی ffmpeg.exe به پوشه خروجی
+        Move-Item -Path ffmpeg_extracted\*\bin\ffmpeg.exe -Destination dist\
+
+    - name: Create Clean Zip Package
+      run: |
+        # ساخت یک پوشه شکیل برای کاربر و فشرده‌سازی آن
+        New-Item -ItemType Directory -Force -Path YouTube-Downloader
+        Move-Item -Path dist\main.exe -Destination YouTube-Downloader\
+        Move-Item -Path dist\ffmpeg.exe -Destination YouTube-Downloader\
+        Compress-Archive -Path YouTube-Downloader -DestinationPath YouTube-Downloader-Windows.zip
+
+    - name: Release and Upload to GitHub
+      uses: softprops/action-gh-release@v2
+      with:
+        files: YouTube-Downloader-Windows.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
