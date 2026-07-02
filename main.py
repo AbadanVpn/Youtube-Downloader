@@ -220,7 +220,7 @@ class QueueDialog(QDialog):
             bg_btn = "#e2e8f0"
 
         qss = f"""
-            QDialog {{ background-color: {bg_main}; color: {text_white}; font-family: 'IRANSans', 'Segoe UI'; }}
+            QDialog {{ background-color: {bg_main}; color: {text_white}; font-family: 'IRANSansMobile', 'Segoe UI'; }}
             QLabel {{ color: {text_white}; background: transparent; }}
             QListWidget#PopupQueueList {{ background-color: {bg_input}; border: 1px solid {border_input}; border-radius: 8px; color: {text_white}; padding: 5px; font-size: 13px; }}
             QPushButton#PopupDeleteBtn {{ background-color: {bg_btn}; color: #dc2626; border: 1px solid #dc2626; border-radius: 6px; padding: 7px 14px; font-weight: bold; font-size: 13px; }}
@@ -792,7 +792,7 @@ class PremiumXrayDownloader(QMainWindow):
             arrow_color = "#64748b"
 
         qss = f"""
-            QWidget {{ background-color: {bg_main}; color: {text_white}; font-family: 'IRANSans', 'Segoe UI'; }}
+            QWidget {{ background-color: {bg_main}; color: {text_white}; font-family: 'IRANSansMobile', 'Segoe UI'; }}
             QLabel {{ background-color: transparent; color: {text_white}; }}
             #HeaderTitle {{ color: {text_white}; font-size: 17px; font-weight: bold; background-color: transparent; }}
             #TopBarBtn {{ background-color: {bg_btn}; color: {text_white}; border: 1px solid {border_input}; border-radius: 8px; padding: 6px 14px; font-weight: bold; }}
