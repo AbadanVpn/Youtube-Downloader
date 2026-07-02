@@ -27,17 +27,25 @@ jobs:
       run: |
         pyinstaller --noconsole --onefile main.py
 
-    - name: Download and Extract FFmpeg (Guaranteed Link)
+    - name: Download and Extract FFmpeg (Guaranteed BtbN Link)
       run: |
-        $url = "https://github.com/GyanD/codexffmpeg/releases/download/2026-06-21-git-d007a34651/ffmpeg-2026-06-21-git-d007a34651-essentials_build.zip"
+        # 🟢 دانلود مستقیم آخرین نسخه Essentials و پایدار از ریپازیتوری BtbN
+        $url = "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl-shared.zip"
         Invoke-WebRequest -Uri $url -OutFile "ffmpeg.zip"
         Expand-Archive -Path "ffmpeg.zip" -DestinationPath "ffmpeg_extracted"
 
     - name: Create Clean Zip Package
       run: |
+        # ساخت پوشه نهایی برای کاربر
         New-Item -ItemType Directory -Force -Path YouTube-Downloader
+        
+        # انتقال فایل اصلی برنامه
         Move-Item -Path dist\main.exe -Destination YouTube-Downloader\
+        
+        # پیدا کردن هوشمند ffmpeg.exe استخراج شده از پوشه‌های تو در تو و کپی آن
         Get-ChildItem -Path "ffmpeg_extracted" -Filter "ffmpeg.exe" -Recurse | Copy-Item -Destination YouTube-Downloader\
+        
+        # فشرده‌سازی نهایی پوشه برای دانلود راحت کاربر
         Compress-Archive -Path YouTube-Downloader -DestinationPath YouTube-Downloader-Windows.zip
 
     - name: Release and Upload to GitHub
