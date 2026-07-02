@@ -3,7 +3,7 @@ name: Build and Package Windows EXE
 on:
   push:
     tags:
-      - 'v*' # هر زمان تگی مثل v1.0.0 بزنی، این اسکریپت فعال میشه
+      - 'v*' # با زدن تگی مثل v1.0.1 این فرآیند شروع می‌شود
 
 jobs:
   build:
@@ -28,24 +28,24 @@ jobs:
       run: |
         pyinstaller --noconsole --onefile main.py
 
-    # 🛠️ راه‌حل قطعی: استفاده از اکشن رسمی و پرسرعت برای راه‌اندازی ffmpeg
-    - name: Setup FFmpeg
-      uses: FedericoCarboni/setup-ffmpeg@v3
-      id: setup-ffmpeg
+    - name: Download and Extract FFmpeg (Guaranteed Link)
+      run: |
+        # دانلود نسخه پرتابل و رسمی از سرورهای گیت‌هاب بدون محدودیت curl
+        Invoke-WebRequest -Uri "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip" -OutFile "ffmpeg.zip"
+        Expand-Archive -Path "ffmpeg.zip" -DestinationPath "ffmpeg_extracted"
 
     - name: Create Clean Zip Package
       run: |
-        # ساخت یک پوشه شکیل برای کاربر
+        # ساخت پوشه نهایی برای کاربر
         New-Item -ItemType Directory -Force -Path YouTube-Downloader
         
-        # انتقال فایل اجرایی اصلی به پوشه خروجی
+        # انتقال فایل اصلی برنامه
         Move-Item -Path dist\main.exe -Destination YouTube-Downloader\
         
-        # پیدا کردن مسیر دقیق ffmpeg.exe نصب شده توسط اکشن و کپی کردن آن به پوشه خروجی
-        $ffmpegPath = (Get-Command ffmpeg).Source
-        Copy-Item -Path $ffmpegPath -Destination YouTube-Downloader\
+        # پیدا کردن هوشمند ffmpeg.exe استخراج شده و کپی آن به پوشه اصلی
+        Get-ChildItem -Path "ffmpeg_extracted" -Filter "ffmpeg.exe" -Recurse | Copy-Item -Destination YouTube-Downloader\
         
-        # فشرده‌سازی نهایی
+        # فشرده‌سازی نهایی پوشه برای دانلود راحت کاربر
         Compress-Archive -Path YouTube-Downloader -DestinationPath YouTube-Downloader-Windows.zip
 
     - name: Release and Upload to GitHub
