@@ -16,7 +16,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-file: '3.10'
+        python-version: '3.10'
         cache: 'pip'
 
     - name: Install Dependencies
@@ -28,20 +28,24 @@ jobs:
       run: |
         pyinstaller --noconsole --onefile main.py
 
-    - name: Download FFmpeg (Standalone for User)
-      run: |
-        # دانلود نسخه پرتابل و رسمی ffmpeg برای ویندوز
-        curl -L -o ffmpeg.zip https://github.com/GyanD/codexffmpeg/releases/download/2026-06-21-git-d007a34651/ffmpeg-2026-06-21-git-d007a34651-essentials_build.zip
-        Expand-Archive -Path ffmpeg.zip -DestinationPath ffmpeg_extracted
-        # پیدا کردن و جابجایی فایل اصلی ffmpeg.exe به پوشه خروجی
-        Move-Item -Path ffmpeg_extracted\*\bin\ffmpeg.exe -Destination dist\
+    # 🛠️ راه‌حل قطعی: استفاده از اکشن رسمی و پرسرعت برای راه‌اندازی ffmpeg
+    - name: Setup FFmpeg
+      uses: FedericoCarboni/setup-ffmpeg@v3
+      id: setup-ffmpeg
 
     - name: Create Clean Zip Package
       run: |
-        # ساخت یک پوشه شکیل برای کاربر و فشرده‌سازی آن
+        # ساخت یک پوشه شکیل برای کاربر
         New-Item -ItemType Directory -Force -Path YouTube-Downloader
+        
+        # انتقال فایل اجرایی اصلی به پوشه خروجی
         Move-Item -Path dist\main.exe -Destination YouTube-Downloader\
-        Move-Item -Path dist\ffmpeg.exe -Destination YouTube-Downloader\
+        
+        # پیدا کردن مسیر دقیق ffmpeg.exe نصب شده توسط اکشن و کپی کردن آن به پوشه خروجی
+        $ffmpegPath = (Get-Command ffmpeg).Source
+        Copy-Item -Path $ffmpegPath -Destination YouTube-Downloader\
+        
+        # فشرده‌سازی نهایی
         Compress-Archive -Path YouTube-Downloader -DestinationPath YouTube-Downloader-Windows.zip
 
     - name: Release and Upload to GitHub
