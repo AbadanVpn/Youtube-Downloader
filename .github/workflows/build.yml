@@ -3,7 +3,7 @@ name: Build and Package Windows EXE
 on:
   push:
     tags:
-      - 'v*' # با زدن تگی مثل v1.0.4 این فرآیند شروع می‌شود
+      - 'v*' # با زدن تگ جدید فعال می‌شود
 
 jobs:
   build:
@@ -16,8 +16,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10' # 🟢 این بخش اصلاح شد تا گیت‌هاب ارور سینتکس ندهد
-        cache: 'pip'
+        python-version: '3.10'
 
     - name: Install Dependencies
       run: |
@@ -30,23 +29,15 @@ jobs:
 
     - name: Download and Extract FFmpeg (Guaranteed Link)
       run: |
-        # 🟢 استفاده از لینک فوق‌العاده سبک‌تر و تضمینی Essentials
         $url = "https://github.com/GyanD/codexffmpeg/releases/download/2026-06-21-git-d007a34651/ffmpeg-2026-06-21-git-d007a34651-essentials_build.zip"
         Invoke-WebRequest -Uri $url -OutFile "ffmpeg.zip"
         Expand-Archive -Path "ffmpeg.zip" -DestinationPath "ffmpeg_extracted"
 
     - name: Create Clean Zip Package
       run: |
-        # ساخت پوشه نهایی برای کاربر
         New-Item -ItemType Directory -Force -Path YouTube-Downloader
-        
-        # انتقال فایل اصلی برنامه
         Move-Item -Path dist\main.exe -Destination YouTube-Downloader\
-        
-        # پیدا کردن هوشمند ffmpeg.exe استخراج شده و کپی آن به پوشه اصلی
         Get-ChildItem -Path "ffmpeg_extracted" -Filter "ffmpeg.exe" -Recurse | Copy-Item -Destination YouTube-Downloader\
-        
-        # فشرده‌سازی نهایی پوشه برای دانلود راحت کاربر
         Compress-Archive -Path YouTube-Downloader -DestinationPath YouTube-Downloader-Windows.zip
 
     - name: Release and Upload to GitHub
